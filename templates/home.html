@@ -1,0 +1,92 @@
+<%inherit file="base.html"/>
+    <style>
+p {
+  font-family:Garamond, Georgia, serif;
+}
+    </style>
+    <script>
+function encodeImage(img) {
+  var c = document.getElementById("myCanvas");
+  var ctx = c.getContext("2d");
+  ctx.drawImage(img, 0, 0);
+  alert(c.toDataURL());
+}
+
+function uploadUrl() {
+  var url = $('#urlInput').val();
+
+  // validate url here
+
+  $.ajax({
+    url: '/image',
+    type: 'POST',
+    data: {
+      'url' : url
+    }
+  });
+  
+  // create invisible image
+  /*
+  var targetImage = document.createElement('img');
+  targetImage.onload = function() {
+    alert('it loaded!');
+    alert(targetImage.width);
+
+    encodeImage(targetImage);
+  }
+  targetImage.onerror = function() {
+    alert('could not load image url');
+  }
+
+
+  targetImage.src = url;
+  */
+};
+    </script>
+
+    <div class="row">
+      <div class="small-12 columns">
+% if not loggedIn:
+        <h4>What is ImgThumb?</h4>
+        <p>ImgThumb is a small tool for bookmarking online images.  </p>
+
+        <h4>How is ImgThumb different from other bookmarking sites?</h4>
+        <p>ImgThumb is strictly for bookmarking images and is built around that idea.  </p>
+
+        <h4>How is ImgThumb different from other photo-sharing sites?</h4>
+        <p>ImgThumb is designed for personal use.  While it may one day incorporate sharing in some form, it is currently built to be a simple and convenient image bookmarker.  If you're really into sharing photos you find, we have <a href="/recommendations">recommendations</a>.</p>
+
+        <h4>Login now to start bookmarking images! </h4>
+        <%include file="login_buttons.html" args="redirect_uri=redirect_uri" />
+% else:
+
+        <div>
+          <h4>Upload</h4>
+          <label>Image URL</label>
+          <input id="urlInput" type="text" placeholder="(type image url here)" />
+          <a href="javascript:uploadUrl();" class="button">Upload</a>
+        </div>
+      
+        <hr style="width: 100%;" />
+
+        <h4>Images</h4>
+        <div class="row">
+          <div class="small-8 columns">
+              hashes
+            <div style="text-align: center">
+              <a href="javascript:void(0);" class="button">List View</a> <a href="javascript:void(0);" class="button">Block View</a>
+            </div>
+          </div>
+          <div class="small-4 columns">
+            preview
+          </div>
+        </div>
+      
+% endif
+      </div>
+    </div>
+
+
+      
+    </div>
+
