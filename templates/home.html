@@ -3,14 +3,67 @@
 p {
   font-family:Garamond, Georgia, serif;
 }
+
+.thumbnailBox {
+  float: left;
+  width: 36px;
+  height: 36px;
+  border: solid 2px;
+  margin: 2px;
+}
+
+.thumbnailBox:hover {
+  border-color: rgb(0, 133, 255);
+}
+
+.thumbnail {
+  width: 32px;
+  height: 32px;
+  margin: 0px;
+}
+
+.separator {
+  margin: 2px;
+}
+
+#thumbnailPool {
+  min-height: 200px;
+}
+
+#previewImage {
+  border: solid 1px gray;
+}
+
+#previewUrl {
+  font-size: 0.6em;
+}
+
     </style>
     <script>
-function encodeImage(img) {
-  var c = document.getElementById("myCanvas");
-  var ctx = c.getContext("2d");
-  ctx.drawImage(img, 0, 0);
-  alert(c.toDataURL());
+
+function setPreviewSrc(url) {
+  $('#previewImage').attr('src', url);
+  $('#previewUrl').text(url);
+  $('#previewUrl').attr('href', url);
 }
+
+function addImage(data) {
+  var thumbnailBox = document.createElement('div');
+  $(thumbnailBox).addClass('thumbnailBox');
+
+  $('#thumbnailPool').append(thumbnailBox);
+
+  var thumbnail = document.createElement('img');
+  $(thumbnail).addClass('thumbnail');
+  $(thumbnailBox).append(thumbnail)
+  thumbnail.src = data['url'];
+
+  $(thumbnailBox).click(function (event) {
+    setPreviewSrc(data['url']);
+  });
+
+
+};
 
 function uploadUrl() {
   var url = $('#urlInput').val();
@@ -22,25 +75,11 @@ function uploadUrl() {
     type: 'POST',
     data: {
       'url' : url
-    }
-  });
-  
-  // create invisible image
-  /*
-  var targetImage = document.createElement('img');
-  targetImage.onload = function() {
-    alert('it loaded!');
-    alert(targetImage.width);
-
-    encodeImage(targetImage);
-  }
-  targetImage.onerror = function() {
-    alert('could not load image url');
-  }
-
-
-  targetImage.src = url;
-  */
+    },
+    success: function(data, textStatus, jqXHR) {
+      addImage(data);
+    },
+  });  
 };
     </script>
 
@@ -63,22 +102,29 @@ function uploadUrl() {
         <div>
           <h4>Upload</h4>
           <label>Image URL</label>
-          <input id="urlInput" type="text" placeholder="(type image url here)" />
+
+          <input id="urlInput" type="text" placeholder="(type image url here)" value="http://thumbs.dreamstime.com/z/victory-runner-14592136.jpg"></input>
           <a href="javascript:uploadUrl();" class="button">Upload</a>
         </div>
       
-        <hr style="width: 100%;" />
+        <hr class="separator" style="width: 100%;" />
 
         <h4>Images</h4>
         <div class="row">
           <div class="small-8 columns">
-              hashes
-            <div style="text-align: center">
-              <a href="javascript:void(0);" class="button">List View</a> <a href="javascript:void(0);" class="button">Block View</a>
+            <div id="thumbnailPool">
+% for thumbnail in thumbnails:
+              <div class="thumbnailBox">
+                <img class="thumbnail" src="/thumbnail?id=${thumbnail['urlSha']}" onclick="setPreviewSrc('${thumbnail['url']}');"/>
+              </div>
+% endfor
             </div>
           </div>
           <div class="small-4 columns">
-            preview
+            <div id="previewBox">
+              <img id="previewImage" />
+              <a id="previewUrl" />
+            </div>
           </div>
         </div>
       
